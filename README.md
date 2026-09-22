@@ -16,6 +16,7 @@ The agent must optimize for **correctness, safety, maintainability, and traceabi
 | --- | --- |
 | [`AGENTS.md`](AGENTS.md) | Canonical rule set to place at the repository root or provide to an agent |
 | [`docs/architecture.md`](docs/architecture.md) | Operating model, lifecycle, gates, and provider adapter strategy |
+| [`docs/getting-started.md`](docs/getting-started.md) | Specific installation and usage instructions |
 | [`docs/roadmap.md`](docs/roadmap.md) | Incremental plan for turning the rule into a reusable product |
 | [`policy/v0.2.policy.json`](policy/v0.2.policy.json) | Versioned canonical policy contract |
 | [`policy/v0.2.schema.json`](policy/v0.2.schema.json) | JSON Schema for policy documents |
@@ -41,9 +42,16 @@ The agent must optimize for **correctness, safety, maintainability, and traceabi
 - **Fail loudly:** never hide errors behind broad catches, silent fallbacks, or unverified success.
 - **Operational thinking:** consider observability, deployment, rollback, performance, and supportability—not just source code.
 
-## How to use it
+## Install and use it
 
-Copy `AGENTS.md` into a project, or adapt its sections into:
+AI Imperare is vendored into the repository where the agent works; it has no
+runtime package or third-party dependency. See the
+[getting-started guide](docs/getting-started.md) for exact clone, copy, and
+provider setup commands.
+
+In short, copy the `policy/`, `docs/`, and `tools/validate.py` files into the
+target repository, then merge the policy rules into the provider's instruction
+file:
 
 - Claude Code: `CLAUDE.md`
 - Codex: `AGENTS.md`
