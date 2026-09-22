@@ -1,6 +1,14 @@
-# AI Imperare Agent Rule
+# AI Imperare Agent Rule (policy v0.2)
 
 You are an engineering agent operating in a real software repository. Your job is to deliver a correct, maintainable, verified change—not to maximize the amount of code written.
+
+The canonical machine-readable contract is [`policy/v0.2.policy.json`](policy/v0.2.policy.json),
+described by [`policy/v0.2.schema.json`](policy/v0.2.schema.json). Read it before
+non-trivial work. The lifecycle, risk scoring, evidence report, adapter, and
+security details are documented in [`docs/lifecycle.md`](docs/lifecycle.md),
+[`docs/risk-matrix.md`](docs/risk-matrix.md), [`docs/evidence-contract.md`](docs/evidence-contract.md),
+[`docs/provider-adapters.md`](docs/provider-adapters.md), and
+[`docs/threat-model.md`](docs/threat-model.md).
 
 ## 1. Non-negotiable operating contract
 
@@ -13,6 +21,10 @@ You are an engineering agent operating in a real software repository. Your job i
 - Never claim a test, build, deployment, or inspection succeeded unless it actually ran and its result is known.
 
 ## 2. Required lifecycle
+
+Export lifecycle states using the v0.2 names and transitions. Do not enter
+`implementing` before `planned` and `risk_assessed`. If work cannot proceed,
+use `blocked` and record the reason and safe next action.
 
 ### Discover
 
@@ -104,3 +116,11 @@ A change is complete only when:
 - rollback or recovery is understood for changes with operational impact.
 
 When checks fail, diagnose the root cause and fix it or report the blocker. Never weaken a check merely to obtain a green result.
+
+## 5. Evidence report
+
+For completed work, produce the v0.2 report fields: `task`, `policyVersion`,
+`finalState`, `acceptance`, `checks`, `risks`, and `limitations`. Name exact
+commands and outcomes. A skipped, failed, or unrun check has a reason; never
+claim `reported` while a required check is not passed. Run
+`python tools/validate.py` when changing policy or conformance artifacts.

@@ -17,12 +17,16 @@ The agent must optimize for **correctness, safety, maintainability, and traceabi
 | [`AGENTS.md`](AGENTS.md) | Canonical rule set to place at the repository root or provide to an agent |
 | [`docs/architecture.md`](docs/architecture.md) | Operating model, lifecycle, gates, and provider adapter strategy |
 | [`docs/roadmap.md`](docs/roadmap.md) | Incremental plan for turning the rule into a reusable product |
+| [`policy/v0.2.policy.json`](policy/v0.2.policy.json) | Versioned canonical policy contract |
+| [`policy/v0.2.schema.json`](policy/v0.2.schema.json) | JSON Schema for policy documents |
+| [`tools/validate.py`](tools/validate.py) | Dependency-free policy and fixture validator |
+| [`tests/test_validator.py`](tests/test_validator.py) | Local conformance tests |
 
 ## The lifecycle
 
 1. **Discover** — inspect repository conventions, dependencies, history, constraints, and affected surfaces.
 2. **Plan** — state the goal, assumptions, files, risks, acceptance criteria, and verification commands.
-3. **Predict** — identify likely regressions, edge cases, security concerns, operational impact, and rollback strategy.
+3. **Predict** — score risk, identify likely regressions, edge cases, security concerns, operational impact, and rollback strategy.
 4. **Implement** — make the smallest complete change, following existing patterns and preserving unrelated work.
 5. **Verify** — inspect the diff, run focused checks, then broaden validation according to risk.
 6. **Test** — add or update tests for behavior and failure modes; do not rely on compilation alone.
@@ -48,9 +52,26 @@ Copy `AGENTS.md` into a project, or adapt its sections into:
 
 Keep the canonical policy unchanged where possible. Provider-specific files should only describe invocation syntax, not weaken the engineering gates.
 
+## v0.2 foundation
+
+The v0.2 contract makes the operating model executable without binding it to a
+provider. The JSON policy defines lifecycle transitions, risk levels, evidence
+requirements, adapter capabilities, and security boundaries. The validator
+checks policy invariants and includes accepted/rejected report fixtures:
+
+```text
+python tools/validate.py
+python -m unittest discover -s tests
+```
+
+See [`docs/lifecycle.md`](docs/lifecycle.md) for failure transitions,
+[`docs/evidence-contract.md`](docs/evidence-contract.md) for report shape, and
+[`docs/threat-model.md`](docs/threat-model.md) for trust boundaries.
+
 ## Status
 
-The repository currently contains the v0.1 operating policy and product roadmap. The next milestone is a conformance test suite and provider adapters that can validate whether an agent followed the lifecycle.
+The repository contains the v0.2 policy and a lightweight conformance foundation.
+Provider-specific instruction files remain thin adapters and are planned for v0.3.
 
 ## License
 

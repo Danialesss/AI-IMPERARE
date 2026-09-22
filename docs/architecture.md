@@ -25,27 +25,27 @@ The policy defines engineering behavior. Adapters define only where the policy i
 ## 2. State machine
 
 ```text
-request
-  -> discovered
-  -> planned
-  -> risk-predicted
-  -> implementing
-  -> verifying
-  -> tested
-  -> reported
+requested -> discovered -> planned -> risk_assessed
+    -> implementing -> verifying -> tested -> reported
+                         \-> blocked
 ```
 
-An agent may return to an earlier state when evidence invalidates an assumption. It must not skip directly from request to implementation for non-trivial work.
+The normative transitions and failure events are in [`lifecycle.md`](lifecycle.md)
+and `policy/v0.2.policy.json`. An agent may return to an earlier state when
+evidence invalidates an assumption, but must record the rewind. It must not
+skip directly from requested to implementation.
 
 ## 3. Risk-based verification
 
 | Risk | Examples | Minimum evidence |
 | --- | --- | --- |
-| Low | docs, isolated formatting, local wording | diff inspection and relevant lint/docs check |
-| Medium | business logic, API behavior, persistence | focused tests, type/build check, caller review |
-| High | auth, payments, migrations, concurrency, deployment | focused and integration tests, security review, rollback plan, explicit human approval where applicable |
+| Low (0–3) | docs, isolated formatting, local wording | diff inspection and relevant lint/docs check |
+| Medium (4–6) | business logic, API behavior, persistence | focused tests, type/build check, caller review |
+| High (7–10) | auth, payments, migrations, concurrency, deployment | focused and integration tests, security review, rollback plan, explicit human approval where applicable |
 
-The agent should select checks based on affected behavior, not a fixed ritual. A skipped check is a reported limitation, never an implicit pass.
+The scoring dimensions and machine-readable minimum evidence are in
+[`risk-matrix.md`](risk-matrix.md). A skipped check is a reported limitation,
+never an implicit pass.
 
 ## 4. Control surfaces
 
@@ -57,26 +57,8 @@ The agent should select checks based on affected behavior, not a fixed ritual. A
 
 ## 5. Evidence record
 
-The eventual machine-readable evidence format should capture:
-
-```yaml
-task: "short description"
-acceptance:
-  - id: AC-1
-    statement: "..."
-    status: met
-checks:
-  - command: "npm test -- --runInBand"
-    status: passed
-    notes: "42 tests"
-risks:
-  - statement: "..."
-    mitigation: "..."
-limitations:
-  - "..."
-```
-
-This record makes reports auditable without requiring a specific model or provider.
+The v0.2 JSON report contract is defined in [`evidence-contract.md`](evidence-contract.md).
+It makes reports auditable without requiring a specific model or provider.
 
 ## 6. Non-goals
 

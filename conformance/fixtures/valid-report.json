@@ -1,0 +1,9 @@
+{
+  "task": "update documentation",
+  "policyVersion": "0.2",
+  "finalState": "reported",
+  "acceptance": [{"id": "AC-1", "statement": "docs updated", "status": "met", "evidenceRefs": ["check-1"]}],
+  "checks": [{"id": "check-1", "command": "python tools/validate.py", "status": "passed", "result": "valid"}],
+  "risks": [{"statement": "documentation-only change", "score": 1, "level": "low", "mitigation": "review diff"}],
+  "limitations": []
+}
