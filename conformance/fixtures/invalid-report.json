@@ -1,0 +1,9 @@
+{
+  "task": "unsafe report",
+  "policyVersion": "0.2",
+  "finalState": "reported",
+  "acceptance": [{"id": "AC-1", "statement": "done", "status": "met", "evidenceRefs": []}],
+  "checks": [{"id": "check-1", "command": "python -m unittest", "status": "failed", "result": "failure"}],
+  "risks": [],
+  "limitations": []
+}

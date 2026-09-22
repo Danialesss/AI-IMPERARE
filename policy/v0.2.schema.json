@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-imperare.dev/schema/policy/v0.2.json",
+  "title": "AI Imperare v0.2 policy",
+  "description": "Provider-neutral policy contract. The validator also enforces transition invariants.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "lifecycle",
+    "riskLevels",
+    "evidenceContract",
+    "adapters",
+    "securityBoundaries"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialState", "terminalStates", "states", "transitions", "invariants"],
+      "properties": {
+        "initialState": { "type": "string", "const": "requested" },
+        "terminalStates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "states": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "event"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "event": { "type": "string" }
+            }
+          },
+          "minItems": 1
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    },
+    "riskLevels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "scoreRange", "minimumEvidence", "approvalRequired"],
+        "properties": {
+          "id": { "type": "string" },
+          "scoreRange": {
+            "type": "array",
+            "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minimumEvidence": { "type": "array", "items": { "type": "string" } },
+          "approvalRequired": { "type": "boolean" }
+        }
+      },
+      "minItems": 1
+    },
+    "evidenceContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "requiredFields", "checkStatuses", "claimRule"],
+      "properties": {
+        "version": { "type": "string", "const": "0.2" },
+        "requiredFields": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "checkStatuses": {
+          "type": "array",
+          "items": { "enum": ["passed", "failed", "skipped", "not_run"] },
+          "minItems": 1
+        },
+        "claimRule": { "type": "string", "minLength": 1 }
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "instructionFile", "requiredCapabilities", "eventMapping"],
+        "properties": {
+          "provider": { "type": "string" },
+          "instructionFile": { "type": "string" },
+          "requiredCapabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "eventMapping": { "type": "object", "minProperties": 1 }
+        }
+      },
+      "minItems": 1
+    },
+    "securityBoundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentMay", "agentMustNot", "approvalGates"],
+      "properties": {
+        "agentMay": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "agentMustNot": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "approvalGates": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    }
+  }
+}

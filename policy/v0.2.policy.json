@@ -1,0 +1,50 @@
+{
+  "version": "0.2",
+  "lifecycle": {
+    "initialState": "requested",
+    "terminalStates": ["reported", "blocked"],
+    "states": ["requested", "discovered", "planned", "risk_assessed", "implementing", "verifying", "tested", "reported", "blocked"],
+    "transitions": [
+      {"from": "requested", "to": "discovered", "event": "scope_recorded"},
+      {"from": "discovered", "to": "planned", "event": "repository_understood"},
+      {"from": "planned", "to": "risk_assessed", "event": "plan_recorded"},
+      {"from": "risk_assessed", "to": "implementing", "event": "risk_accepted"},
+      {"from": "implementing", "to": "verifying", "event": "implementation_complete"},
+      {"from": "verifying", "to": "tested", "event": "checks_complete"},
+      {"from": "tested", "to": "reported", "event": "evidence_recorded"},
+      {"from": "discovered", "to": "blocked", "event": "missing_context"},
+      {"from": "planned", "to": "blocked", "event": "approval_denied"},
+      {"from": "risk_assessed", "to": "blocked", "event": "risk_unacceptable"},
+      {"from": "implementing", "to": "blocked", "event": "implementation_failed"},
+      {"from": "verifying", "to": "blocked", "event": "verification_failed"},
+      {"from": "tested", "to": "blocked", "event": "required_check_failed"}
+    ],
+    "invariants": [
+      "No implementation may begin before a recorded plan and risk assessment.",
+      "A failed required check cannot transition to reported.",
+      "Every reported claim references evidence or is explicitly marked unverified.",
+      "Blocked work records the reason, attempted recovery, and next safe action."
+    ]
+  },
+  "riskLevels": [
+    {"id": "low", "scoreRange": [0, 3], "minimumEvidence": ["diff"], "approvalRequired": false},
+    {"id": "medium", "scoreRange": [4, 6], "minimumEvidence": ["diff", "focused_tests", "type_or_build"], "approvalRequired": false},
+    {"id": "high", "scoreRange": [7, 10], "minimumEvidence": ["diff", "focused_tests", "integration_or_security", "rollback_plan"], "approvalRequired": true}
+  ],
+  "evidenceContract": {
+    "version": "0.2",
+    "requiredFields": ["task", "policyVersion", "finalState", "acceptance", "checks", "risks", "limitations"],
+    "checkStatuses": ["passed", "failed", "skipped", "not_run"],
+    "claimRule": "A passed check names the exact command and result; skipped or not_run checks include a reason."
+  },
+  "adapters": [
+    {"provider": "claude-code", "instructionFile": "CLAUDE.md", "requiredCapabilities": ["load_policy", "emit_events", "export_evidence"], "eventMapping": {"tool_call": "implementation_or_check", "assistant_message": "plan_or_report"}},
+    {"provider": "codex", "instructionFile": "AGENTS.md", "requiredCapabilities": ["load_policy", "emit_events", "export_evidence"], "eventMapping": {"tool_call": "implementation_or_check", "assistant_message": "plan_or_report"}},
+    {"provider": "copilot", "instructionFile": ".github/copilot-instructions.md", "requiredCapabilities": ["load_policy", "emit_events", "export_evidence"], "eventMapping": {"tool_call": "implementation_or_check", "assistant_message": "plan_or_report"}}
+  ],
+  "securityBoundaries": {
+    "agentMay": ["read repository files", "edit scoped files", "run approved local checks", "produce evidence"],
+    "agentMustNot": ["exfiltrate secrets", "weaken repository controls", "claim unrun checks passed", "perform destructive or production actions without approval"],
+    "approvalGates": ["credentials and permissions", "production deployment", "irreversible migration", "publishing or external side effects"]
+  }
+}
